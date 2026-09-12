@@ -53,6 +53,23 @@ app.post("/tickets", async (req, res) => {
   }
 });
 
+// Returns every ticket, newest first, this is what the dashboard loads on open
+app.get("/tickets", async (req, res) => {
+  const tickets = await prisma.ticket.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(tickets);
+});
+
+// Marks a ticket as reviewed and approved by a human, the only way status changes from "open"
+app.patch("/tickets/:id/approve", async (req, res) => {
+  const ticket = await prisma.ticket.update({
+    where: { id: Number(req.params.id) },
+    data: { status: "approved" },
+  });
+  res.json(ticket);
+});
+
 // Retrieves a single ticket by its id
 app.get("/tickets/:id", async (req, res) => {
   const ticket = await prisma.ticket.findUnique({
