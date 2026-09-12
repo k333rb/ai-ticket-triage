@@ -28,3 +28,26 @@ jobs:
       - name: Run backend tests
         working-directory: server
         run: npm test
+
+  frontend-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # Only installs dependencies for the frontend, since that is all this job builds
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm install
+
+      # Confirms the React app compiles successfully, catching broken code
+      # even without dedicated frontend tests yet
+      - name: Build frontend
+        working-directory: client
+        run: npm run build
