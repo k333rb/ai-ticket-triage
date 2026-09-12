@@ -34,3 +34,24 @@ Body: ${body}
 }
 
 module.exports = { classifyTicket };
+
+// Generates a suggested reply to the ticket, a human reviews before sending
+async function draftReply(subject, body, category) {
+  const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+
+  const prompt = `
+You are a support agent writing a first draft reply to a customer ticket.
+Category: ${category}
+Subject: ${subject}
+Body: ${body}
+
+Write a short, polite, helpful draft reply. Do not make promises about
+specific refunds, dates, or outcomes, since a human will review and edit
+this before it is sent. Keep it under 100 words.
+`;
+
+  const result = await model.generateContent(prompt);
+  return result.response.text().trim();
+}
+
+module.exports = { classifyTicket, draftReply };

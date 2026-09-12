@@ -19,6 +19,7 @@ model Ticket {
   category      String?
   urgency       String?
   assignedTeam  String?
+  draftReply    String?
   status        String   @default("open")
   createdAt     DateTime @default(now())
 }

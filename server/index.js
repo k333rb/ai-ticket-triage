@@ -6,7 +6,7 @@ const app = express();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const { classifyTicket } = require("./classify");
+const { classifyTicket, draftReply } = require("./classify");
 
 const { routeTicket } = require("./route");
 
@@ -36,11 +36,12 @@ app.post("/tickets", async (req, res) => {
   try {
     const { category, urgency } = await classifyTicket(subject, body);
     const assignedTeam = routeTicket(category);
+    const draft = await draftReply(subject, body, category);
 
     // Update the same ticket with the classification results
     const classifiedTicket = await prisma.ticket.update({
       where: { id: ticket.id },
-      data: { category, urgency, assignedTeam },
+      data: { category, urgency, assignedTeam, draftReply: draft },
     });
 
     res.status(201).json(classifiedTicket);
