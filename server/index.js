@@ -8,6 +8,8 @@ const prisma = new PrismaClient();
 
 const { classifyTicket } = require("./classify");
 
+const { routeTicket } = require("./route");
+
 // Lets Express parse incoming JSON request bodies automatically
 app.use(express.json());
 
@@ -33,11 +35,12 @@ app.post("/tickets", async (req, res) => {
 
   try {
     const { category, urgency } = await classifyTicket(subject, body);
+    const assignedTeam = routeTicket(category);
 
     // Update the same ticket with the classification results
     const classifiedTicket = await prisma.ticket.update({
       where: { id: ticket.id },
-      data: { category, urgency },
+      data: { category, urgency, assignedTeam },
     });
 
     res.status(201).json(classifiedTicket);

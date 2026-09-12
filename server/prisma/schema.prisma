@@ -13,11 +13,12 @@ datasource db {
 // Defines one support ticket, this is the core data every other
 // part of the system reads and writes
 model Ticket {
-  id        Int      @id @default(autoincrement())
-  subject   String
-  body      String
-  category  String?
-  urgency   String?
-  status    String   @default("open")
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  subject       String
+  body          String
+  category      String?
+  urgency       String?
+  assignedTeam  String?
+  status        String   @default("open")
+  createdAt     DateTime @default(now())
 }
