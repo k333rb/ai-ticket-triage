@@ -1,6 +1,10 @@
 // Minimal Express server, sample backend for the ticket triage project
 const express = require("express");
 const app = express();
+const cors = require("cors");
+
+// Allows the React dashboard, running on a different port, to fetch from this API
+app.use(cors());
 
 // Prisma client, generated from our schema, this is how we talk to the database
 const { PrismaClient } = require("@prisma/client");
