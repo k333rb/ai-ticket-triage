@@ -1,0 +1,24 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Defines one support ticket, this is the core data every other
+// part of the system reads and writes
+model Ticket {
+  id        Int      @id @default(autoincrement())
+  subject   String
+  body      String
+  category  String?
+  urgency   String?
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+}
