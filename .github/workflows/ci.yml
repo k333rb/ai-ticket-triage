@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Pinned version avoids silent breakage from an unannounced upgrade
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # Only installs dependencies for the backend, since that is all this job tests
+      - name: Install backend dependencies
+        working-directory: server
+        run: npm install
+
+      - name: Run backend tests
+        working-directory: server
+        run: npm test
