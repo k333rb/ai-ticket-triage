@@ -6,6 +6,8 @@ const app = express();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const { classifyTicket } = require("./classify");
+
 // Lets Express parse incoming JSON request bodies automatically
 app.use(express.json());
 
@@ -16,20 +18,35 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// Creates a new ticket, storing it in the database
+// Creates a new ticket, classifies it, and stores the result
 app.post("/tickets", async (req, res) => {
   const { subject, body } = req.body;
 
-  // A ticket without a subject or body isn't valid, reject it early
   if (!subject || !body) {
     return res.status(400).json({ error: "subject and body are required" });
   }
 
+  // Save the ticket first, so it exists even if classification fails
   const ticket = await prisma.ticket.create({
     data: { subject, body },
   });
 
-  res.status(201).json(ticket);
+  try {
+    const { category, urgency } = await classifyTicket(subject, body);
+
+    // Update the same ticket with the classification results
+    const classifiedTicket = await prisma.ticket.update({
+      where: { id: ticket.id },
+      data: { category, urgency },
+    });
+
+    res.status(201).json(classifiedTicket);
+  } catch (error) {
+    // Classification failed, but the ticket itself was saved successfully,
+    // return it as is rather than losing the submission entirely
+    console.error("Classification failed:", error.message);
+    res.status(201).json(ticket);
+  }
 });
 
 // Retrieves a single ticket by its id
