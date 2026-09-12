@@ -1,15 +1,28 @@
 import { useState, useEffect } from "react";
 
 function App() {
-  // Holds the list of tickets once fetched from the backend
   const [tickets, setTickets] = useState([]);
 
-  // Runs once when the page first loads, fetches the ticket list
   useEffect(() => {
     fetch("http://localhost:3000/tickets")
       .then((res) => res.json())
       .then((data) => setTickets(data));
   }, []);
+
+  // Sends the approval request, then updates just that one ticket locally
+  function handleApprove(id) {
+    fetch(`http://localhost:3000/tickets/${id}/approve`, {
+      method: "PATCH",
+    })
+      .then((res) => res.json())
+      .then((updatedTicket) => {
+        setTickets((prevTickets) =>
+          prevTickets.map((ticket) =>
+            ticket.id === updatedTicket.id ? updatedTicket : ticket,
+          ),
+        );
+      });
+  }
 
   return (
     <div>
@@ -19,6 +32,10 @@ function App() {
           <li key={ticket.id}>
             <strong>{ticket.subject}</strong> — {ticket.category} /{" "}
             {ticket.urgency} — {ticket.status}
+            <p>{ticket.draftReply}</p>
+            {ticket.status === "open" && (
+              <button onClick={() => handleApprove(ticket.id)}>Approve</button>
+            )}
           </li>
         ))}
       </ul>
