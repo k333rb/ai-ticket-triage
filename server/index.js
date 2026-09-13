@@ -87,6 +87,22 @@ app.get("/tickets/:id", async (req, res) => {
   res.json(ticket);
 });
 
+// Updates a ticket's draft reply, used when a human edits it before approving
+app.patch("/tickets/:id/draft", async (req, res) => {
+  const { draftReply } = req.body;
+
+  if (!draftReply) {
+    return res.status(400).json({ error: "draftReply is required" });
+  }
+
+  const ticket = await prisma.ticket.update({
+    where: { id: Number(req.params.id) },
+    data: { draftReply },
+  });
+
+  res.json(ticket);
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
