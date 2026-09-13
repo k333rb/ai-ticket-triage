@@ -1,11 +1,5 @@
-/* Removes the browser's default body margin so the app fills the full screen */
-body {
-  margin: 0;
-}
+@import "tailwindcss";
 
-/* The app renders inside this element, must fill the full screen,
-   not be constrained to Vite's original fixed width starter layout */
-#root {
-  width: 100%;
-  min-height: 100vh;
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
 }
